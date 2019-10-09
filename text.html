@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>GBP_Name</title>
+	<style>
+	#exampleTextarea { display: block; width: 99%; resize: none; text-align: center;}
+	#exampleInputFile { display: none; }
+	.centered {
+			display: table;
+			margin-left: auto;
+			margin-right: auto; }
+	</style>
+
+	<div class="centered">
+		<h1 class="item">Who are you?</h1>
+	</div>
+
+	<input type="file" id="exampleInputFile" accept=".txt,.csv,.xml">
+		
+	<script>
+		
+		document.getElementById('btnOpen').onclick = function() {
+			if ('FileReader' in window) {
+				document.getElementById('exampleInputFile').click();
+			} else {
+				alert('Your browser does not support the HTML5 FileReader.');
+			}
+		};
+
+		document.getElementById('exampleInputFile').onchange = function(event) {
+			var fileToLoad = event.target.files[0];
+
+			if (fileToLoad) {
+				var reader = new FileReader();
+				reader.onload = function(fileLoadedEvent) {
+					var textFromFileLoaded = fileLoadedEvent.target.result;
+					document.getElementById('exampleTextarea').value = textFromFileLoaded;
+				};
+				reader.readAsText(fileToLoad, 'UTF-8');
+			}
+		};
+
+		function destroyClickedElement(event) 
+		{
+			document.body.removeChild(event.target);
+		}
+	</script>
+
+</head>
+
+<body>
+
+	<form action="action.php" method="post" target="ifr">
+
+		<button id="btnSave" onclick="location.href='painter.html'">Save</button>
+		<button type="button" onclick="location.href='painter.html'">Next Page</button>
+		<textarea name="Name" id="exampleTextarea" rows="20" maxlength="10" placeholder="Enter your Nickname!"></textarea>
+	</form>
+	<iframe id="hidden" name="ifr" src="painter.html" style="visibility:hidden;display:none"></iframe>
+</body>
+
+</html>

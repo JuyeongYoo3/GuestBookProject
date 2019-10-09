@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<style>
+		.centered {
+			display: table;
+			margin-left: auto;
+			margin-right: auto;
+		}
+	</style>
+	<div class="centered">
+		<h1 class="item">What do you look like?</h1>
+	</div>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>GBP_Face</title>
+    <meta charset="utf-8" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+</head>
+<body>
+    <table border="1" >
+    	<div style="width: 63px; float: left;">500*500</div>
+    	<input id="widthInput" type="number"/>
+    	<input id="heightInput" type="number"/>
+    	<button onclick="getSize()">Set Canvas Size</button><br>
+    	
+    	<div style="width: 63px; float: left;">R. G. B.</div>
+    	<input id="redInput" type="number"/>
+    	<input id="greenInput" type="number"/>
+    	<input id="blueInput" type="number"/><br>
+
+    	<div style="width: 63px; float: left;">7px</div>
+    	<input id="lineWidthInput" type="number"/>
+    	<button onclick="getC()">Set Color Brush</button>
+    	<td colspan="5">
+    		<canvas id="can1" height="500" width="500"
+    		style="background-color:white;cursor:crosshair;">
+    	</canvas>
+
+
+    	<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+                <script type="text/javascript">
+				
+                    var canvas = document.getElementById("can1");
+                    var cv = canvas.getContext("2d");
+                    cv.lineWidth = 5;
+                    var event_Chk;
+                    var x, y;
+					var width;
+                    var state_Coloe = "rgb(0, 0, 0)";
+                    var eraser = false;
+					
+					function getSize()
+					{
+						var cWidth=document.getElementById("widthInput").value;
+						var cHeight=document.getElementById("heightInput").value;
+						canvas.width=cWidth;
+						canvas.height=cHeight;
+					}
+					
+					function getC()
+					{
+						var red=document.getElementById("redInput").value;
+						var green=document.getElementById("greenInput").value;
+						var blue=document.getElementById("blueInput").value;
+						width=document.getElementById("lineWidthInput").value;
+						state_Coloe="rgb("+red+","+green+","+blue+")";
+						cv.lineWidth = width;
+					}
+					
+                    function fn_Clear() {
+                        cv.clearRect(0, 0, canvas.width, canvas.height);
+                    };
+ 
+                    function fn_Sketch() {
+                        canvas.onmousedown = function (event) {
+                            var x = event.x;
+                            var y = event.y;
+ 
+                            cv.beginPath();
+ 
+                            cv.moveTo(x, y);
+                            cv.stroke();
+                            cv.lineWidth = width;
+                        };
+ 
+                        canvas.onmouseup = function (event) {
+                            var x = event.x;
+                            var y = event.y;
+ 
+                            cv.lineTo(x, y);
+                            cv.stroke();
+                            cv.lineWidth = width;
+ 
+                            cv.closePath();
+                        };
+                    };
+
+
+                    canvas.addEventListener('mousedown', function (event) {
+                        event_Chk = true;
+ 
+                        var rect = canvas.getBoundingClientRect();
+ 
+                        x = event.clientX - rect.left;
+                        y = event.clientY - rect.top;
+ 
+                        cv.beginPath();
+                        cv.moveTo(x, y);
+                        cv.strokeStyle = state_Coloe;
+                    }, false);
+ 
+                    canvas.addEventListener('mousemove', function (event) {
+ 
+                        if (event_Chk == true) {
+                            var rect = canvas.getBoundingClientRect();
+ 
+                            x = event.clientX - rect.left;
+                            y = event.clientY - rect.top;
+ 
+                            cv.lineTo(x, y);
+                            cv.stroke();
+                        }
+                    }, false);
+ 
+                    canvas.onmouseup = function () {
+                        cv.closePath();
+                        event_Chk = false;
+                    };
+
+
+                    //Touch Input (http://bencentra.com/code/2014/12/05/html5-canvas-touch-events.html)
+
+					// Set up touch events for mobile, etc
+					//touch or touches
+					canvas.addEventListener("touchstart",function(e) {
+						mousePos = getTouchPos(canvas, e);
+						var touch = e.touches[0];
+						var mouseEvent = new MouseEvent("mousedown", { clientX: touch.clientX, clientY: touch.clientY });
+						canvas.dispatchEvent(mouseEvent);
+					}, false);
+
+					canvas.addEventListener("touched", function(e){
+						var mouseEvent = new MouseEvent("mouseup", {});
+						canvas.dispatchEvent(mouseEvent);
+					}, false);
+
+					canvas.addEventListener("touchmove", function(e){
+						var touch = e.touches[0];
+						var mouseEvent = new MouseEvent("mousemove", {
+							clientX: touch.clientX,
+							clientY: touch.clientY });
+						canvas.dispatchEvent(mouseEvent);
+					}, false);	
+
+					// Get the position of a touch relative to the canvas
+					function getTouchPos(canvasDom, touchEvent){
+						var rect = canvasDom.getBoundingClientRect();
+						return{
+							x: touchEvent.touches[0].clientX - rect.left,
+							y: touchEvent.touches[0].clientY - rect.top
+						};
+					}
+
+					// Prevent scrolling when touching the canvas
+					document.body.addEventListener("touchstart", function (e) {  if (e.target == canvas) {
+						e.preventDefault();}
+					}, false);
+					document.body.addEventListener("touchend", function (e) {
+						if (e.target == canvas) {
+							e.preventDefault();
+						}
+					}, false);
+					document.body.addEventListener("touchmove", function (e) {
+						if (e.target == canvas) {
+							e.preventDefault();
+						}
+					}, false);
+
+					/*------------------위에 터치 코드---------------------*/
+
+
+
+
+
+					/*window.onload = function()
+					{
+						var dwn = document.getElementById('btndownload')
+						  // Event handler for download
+						  dwn.onclick = function(){
+						  	saveImage();
+							download(canvas, 'face.png');
+						  }
+					}
+					// Source from:  http://stackoverflow.com/questions/18480474/how-to-save-an-image-from-canvas
+					
+
+					/* Canvas Donwload */
+					/*
+					function dataUrlToBlob(uri){
+						var str,arr,i,matches,type;
+						uri=uri.split(',');
+						matches=/data:([^;]+)/.exec(uri[0]);
+						if(matches)
+						{
+							type=matches[1];
+						}
+						str=atob(uri[1]);
+						arr = new Uint8Array(str.length);
+						for(i=0;i<arr.length;i++)
+						{
+							arr[i] = str.charCodeAt(i);
+						}
+						
+						return new Blob([arr],{type:type});
+	
+					}
+					*/
+
+
+					function prepareImg() {
+						var canvas = document.getElementById('can1');
+						document.getElementById('inp_img').value = canvas.toDataURL();
+					}
+					
+					
+                </script>
+            </td>
+
+    </table>
+
+    <button style="cursor:pointer;" onclick="fn_Clear();">전체 삭제</button>
+
+    <form method="post" action="faceSave.php" onsubmit="prepareImg();" target="ifr">
+    	<input id="inp_img" name="img" type="hidden" value="">
+    	<button id="bt_upload" onclick="location.href='color.html'">Save</button>
+    </form>
+
+    <!--<button id="btndownload">Save</button>-->
+    <iframe id="hidden" name="ifr" src="color.html" style="visibility:hidden;display:none"></iframe>
+
+	</body>
+</html>
